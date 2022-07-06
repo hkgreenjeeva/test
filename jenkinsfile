@@ -2,4 +2,43 @@ pipeline{
    agent any
    }
    environment{
-   GET_REPO
+   GET_REPO ="git@github.com:hkchintapalli/test.git"
+   }
+   stages {
+   stage ("Checkout"){
+	    when {
+                expression { 
+                   return  REQUESTED_ACTION == 'dev'
+                }
+        }
+	    steps{
+		  script{
+        sh """
+		        echo "${GIT_REPO}"
+              """
+              }
+              }
+              stage ("Deploy In Dev"){
+        when {
+                expression { 
+                   return  REQUESTED_ACTION == 'dev'
+                }
+            }	   
+	    steps{
+		  script{
+		  
+		        sh '''
+			     cd newbranch/script-copy; 
+				 chmod +x copy-erp-dev.sh
+				 ./copy-erp-dev.sh
+				 
+				 #cd ${WORKSPACE}/ansible-playbooks
+				 #ansible-playbook -i erp-host erp-main.yml
+			   
+			   '''
+			 echo "Deployment is done in Dev"
+		     }
+		
+		 }
+	 
+	 } 
