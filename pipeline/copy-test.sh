@@ -1,0 +1,1 @@
+scp -r /var/lib/jenkins/workspace/* root@202.66.172.124:/app
