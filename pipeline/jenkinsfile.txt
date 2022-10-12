@@ -12,7 +12,7 @@ pipeline{
    }
    environment{
     HK_GIT_REPO = "git@github.com:hkchintapalli/test.git"
-	HK_BRANCH = "${params.HK_BRANCH_TAG}"
+	HK_BRANCH = "${params.GIT_BRANCH_TAG}"
 	REPO_CRED = "9558ed45-cdd1-40a6-937d-a1ce8b3eaba6"
 	REQUESTED_ACTION = "${params.REQUESTED_ACTION}"
 	   }
