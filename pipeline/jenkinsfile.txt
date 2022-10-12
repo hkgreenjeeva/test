@@ -1,0 +1,88 @@
+pipeline{
+   agent {label '!master'}
+   options {
+       buildDiscarder(logRotator(numToKeepStr: "10"))
+	   disableConcurrentBuilds()   
+   }
+   
+   parameters{
+    choice( choices: ["copy", "status-check"], description: "Select required action !", name: "REQUESTED_ACTION")
+	string(name: "GIT_BRANCH_TAG", defaultValue: "test", description: "hai..")
+   
+   }
+   environment{
+    HK_GIT_REPO = "git@github.com:hkchintapalli/test.git"
+	HK_BRANCH = "${params.HK_BRANCH_TAG}"
+	REPO_CRED = "9558ed45-cdd1-40a6-937d-a1ce8b3eaba6"
+	REQUESTED_ACTION = "${params.REQUESTED_ACTION}"
+	   }
+   
+   stages {
+   
+     stage ("Checkout"){
+	    when {
+                expression { 
+                   return  REQUESTED_ACTION == 'copy'
+                }
+        }
+	    steps{
+		  script{
+		        sh """
+		        echo "${HK_GIT_REPO}"
+				echo "${HK_BRANCH}"
+				echo "${REPO_CRED}"
+				
+				"""
+				
+			   currentBuild.description = "Pipeline execution of HK"
+			   checkout([$class: 'GitSCM', branches: [[name: "${HK_BRANCH}"]], extensions: [], userRemoteConfigs: [[credentialsId: "${REPO_CRED}", url: "${HK_GIT_REPO}"]]])
+		  
+		  }
+		
+		}
+	 
+	 } 
+stage ("copy files"){
+        when {
+                expression { 
+                   return  REQUESTED_ACTION == 'copy'
+                }
+            }	   
+	    steps{
+			  script{		  
+		        sh '''
+				
+				 
+			     cd pipeline; 
+				 chmod +x copy-test.sh
+				 ./copy-test.sh
+
+			   
+			   '''
+			 echo "copied"
+		     }
+		
+		 }
+	 
+	 } 
+	 
+	 
+	   stage ("status-check"){
+        when {
+                expression { 
+                   return  REQUESTED_ACTION == 'status-check'
+                }
+            }	   
+	    steps{
+			  script{		  
+		        sh '''
+				
+			df -h			 
+			     			   
+			   '''
+			 echo "see status"
+		     }
+		
+		 }
+	 
+	 } 
